@@ -1,6 +1,7 @@
-#include <mbed.h>
 #ifndef IRSENSOR_INCLUDE
 #define IRSENSOR_INCLUDE
+
+#include <mbed.h>
 
 class IRSensor{
   private:
@@ -14,10 +15,8 @@ class IRSensor{
 
   public:
 
-  //inputs are the address of the multiplexer for the IR sensors, and the start register to read from
+  //inputs are the address of the multiplexer for the IR sensors, and the IR sensor bus address
   IRSensor(char mux_address, char mux_cmd);
-  //update sensor reading
-  void sensorUpdate();
   
   //return the output in cm
   float getOutput();

@@ -1,10 +1,13 @@
-#include <mbed.h>
-#include <DigitalOut.h>
-#include <PwmOut.h>
 #ifndef MOTOR_INCLUDE
 #define MOTOR_INCLUDE
 
+#include <mbed.h>
+#include <DigitalOut.h>
+#include <PwmOut.h>
+#include <InterruptIn.h> 
+
 class Motor{
+
   private:
   PinName _dirPin; //direction controlling pin
   PinName _powPin; //power contolling pin
@@ -13,12 +16,23 @@ class Motor{
   int _frequency_kHz; //PWM frequency
   
 
+  PinName _encoderPin;
 
   public:
   mbed::DigitalOut _dirOut;
   mbed::PwmOut _powOut;
 
-  Motor(PinName dirPin, PinName powPin, bool inverse);
+  long int _shaftRevs;
+  long int _encCount;
+  mbed::InterruptIn _encInt;
+
+
+  Motor(PinName dirPin, PinName powPin, bool inverse, PinName encoderPin);
+
+
+  void countPulse();  //encoder updater
+  void encUpdate(); //interrupt call
+  long int getEncoder();
 
   void setDirPin(PinName dirPin);
   void setPowPin(PinName powPin);

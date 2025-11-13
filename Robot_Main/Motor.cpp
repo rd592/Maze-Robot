@@ -2,13 +2,41 @@
 using namespace mbed;
  
 
-Motor::Motor(PinName dirPin, PinName powPin, bool inverse):
-  _dirPin(dirPin), _powPin(powPin), _dirOut(dirPin), _powOut(powPin), _inverse(inverse)
+Motor::Motor(PinName dirPin, PinName powPin, bool inverse, PinName encoderPin):
+  _dirPin(dirPin), _powPin(powPin), _dirOut(dirPin), _powOut(powPin), _inverse(inverse), _encoderPin(encoderPin), _encInt(encoderPin)
 {
   _frequency_kHz = 2; //intitial values
   //setFrequency(_frequency_kHz);
   _dutyCycle = 0;
   setDutyCycle(_dutyCycle);
+}
+
+//encoder counting
+void Motor::countPulse(){
+  if(_dutyCycle >0){
+    if(_dirOut == 1)
+      _encCount++;
+    else
+      _encCount--;
+  }
+
+}
+
+//interrupt start function
+void Motor::encUpdate(){
+  _encCount = 0;
+  _encInt.rise(callback(this, &Motor::countPulse));
+}
+
+//return encoder output adjusting for inversion
+long int Motor::getEncoder(){
+  if(_inverse){
+    return -_encCount;
+  }
+  else{
+    return _encCount; 
+  }
+  
 }
 
 void Motor::setDirPin(PinName dirPin){
@@ -20,6 +48,7 @@ void Motor::setPowPin(PinName powPin){
 void Motor::setInverse(bool inverse){
   _inverse = inverse;
 }
+
 
 PinName Motor::getDirPin(){
   return _dirPin;

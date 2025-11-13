@@ -27,6 +27,11 @@ void MotorController::turn(int direction){
 
 }
 
+void MotorController::printEncoder(){
+  Serial.println(_MotorLeft->getEncoder());
+  Serial.println(_MotorRight->getEncoder());
+}
+
 //controlls the speed of movement, call this to move.
 void MotorController::move(float speed){
 
@@ -43,4 +48,9 @@ void MotorController::move(float speed){
 
   _MotorLeft->setDutyCycle(abs(speed));
   _MotorRight->setDutyCycle(abs(speed));
+}
+//Still need to implement actual revolutions 
+void MotorController::encoderUpdate(){
+  _MotorLeft->encUpdate();
+  _MotorRight->encUpdate();
 }
