@@ -45,15 +45,27 @@ void ServoController::centre(){
 void ServoController::sweep(int points, int range){
   int arrayCol = 0;
   int start_time = millis();
-  for(float i = (180 - range)/2; i<= (90+(range/2)); i = i + (range/points)){
-    moveTo(i);
-    //_distanceArray[arrayCol][_arrayRow] = _sensor.getOutput(); //this seems to be the problem. might need to implement multithreading
+  moveTo((180-range)/2);
+  wait_us(2000);
+  for(int i = (180 - range)/2; i<= (90+(range/2)); i = i + (range/points)){
+
+    moveTo(i); //move servo, take sensor reading, store in distanceArray
+    float temp = _sensor.getOutput(); 
+    _distanceArray[arrayCol] = temp;
+    Serial.println(_distanceArray[arrayCol]);
+
     arrayCol++;
-    wait_us(1000);
+    if(arrayCol >= COLUMNS)
+    wait_us(500);
   }
-  
-  //Serial.println(_distanceArray[0][0]);
-  _arrayRow++;
+
+  centre();
+
+}
+
+//returns pointer to distance array
+float* ServoController::returnArray(){
+  return _distanceArray;
 }
 
 

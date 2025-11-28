@@ -21,6 +21,8 @@ class IRSensor{
   //return the output in cm
   float getOutput();
 
+  float avgOutput();
+
 
 } ;
 

@@ -8,6 +8,8 @@
 #include <Servo.h>
 #include "USSensor.h"
 
+#define COLUMNS 10 //number of columns in the distance array
+
 class ServoController{
 
   private:
@@ -20,8 +22,8 @@ class ServoController{
   mbed::Timer _servoTimer;
 
   
-  int _distanceArray[8][10];
-  int _arrayRow;
+  float _distanceArray[COLUMNS]; //stores sensor readings 
+
 
   Servo _servo;
   USSensor _sensor;
@@ -34,6 +36,7 @@ class ServoController{
   void moveTo(int angle); //move the servo to a given angle
   void centre(); //centre the servo
   void sweep(int points, int range); //sweep between both ends of the servos range, with a given number of points and angular range
+  float* returnArray();
 
 };
 

@@ -27,14 +27,80 @@ void MotorController::turn(int direction){
 
 }
 
+//this function works by calculating the angular distance needed to turn based on the known turning perimeter (44cm)
+
+//time for 1 rotation is 3.2s
+//distance between wheels = 14cm
+//perimeter = 44cm
+void MotorController::turnAngle(float angle, float moveSpeed){
+
+  //convert angle to distance
+  float perimeter = 44;
+  float angleRatio = abs(angle)/360;
+  float angularDistance = perimeter*angleRatio; //distance the motors need to move
+
+  //turn right
+  if(angle >0){
+    _MotorLeftDir = 1;
+    _MotorRightDir = 0;
+  }
+  //turn left
+  else{
+    _MotorLeftDir = 0;
+    _MotorRightDir = 1;
+  }
+
+  moveDistance(angularDistance, moveSpeed);
+
+  //reset motor direction
+  _MotorLeftDir = 1;
+  _MotorRightDir = 1;
+
+}
+
+//adjust for encoder measurements per rotation, gear ratio, then distance moved per rotation (4.8 = wheel size cm, 3.1415 = pi)
+float MotorController::getDistanceLeft(){
+  _distanceLeft = (((float)_MotorLeft->getEncoder()/6)/298)*3.1415926*4.8;
+  return _distanceLeft; 
+}
+float MotorController::getDistanceRight(){
+  _distanceRight = (((float)_MotorRight->getEncoder()/6)/298)*3.1415926*4.8;
+  return _distanceRight;
+}
+
 void MotorController::printEncoder(){
-  Serial.println(_MotorLeft->getEncoder());
-  Serial.println(_MotorRight->getEncoder());
+  float motorLeftCm = getDistanceLeft();
+  float motorRightCm = getDistanceRight();
+
+}
+
+
+void MotorController::moveDistance(float distance, float moveSpeed){
+  float startMotorLeft = getDistanceLeft();
+  float startMotorRight = getDistanceRight();
+
+  //if direction is negative, move backwards. direction can be controlled with distance or speed
+  int direction = 1;
+  if(distance < 0){
+    direction = -1;
+  }
+
+
+  float startTime = millis();
+
+//loop movement until encoder reads the right value
+  while(abs(getDistanceLeft()-startMotorLeft) <abs(distance)){
+    speed(moveSpeed*direction);
+    wait_us(100);
+  }
+  speed(0);
+  //Serial.println("Time:");
+  //Serial.println(millis()-startTime);
 }
 
 //controlls the speed of movement, call this to move.
-void MotorController::move(float speed){
-
+void MotorController::speed(float speed){
+  
   int moveDir = 0;
   if (speed >= 0){
     moveDir = 1;

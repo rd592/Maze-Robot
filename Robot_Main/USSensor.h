@@ -17,7 +17,8 @@ class USSensor{
   public:
 
   USSensor(PinName pin);
-  float getOutput();
+  float getOutput(); //single us readings
+  float avgOutput();//returns the average of 10 us readings
 
 
 };

@@ -1,6 +1,7 @@
 using namespace mbed;
 #include <mbed.h>
 #include <DigitalOut.h>
+#include <DigitalIn.h>
 #include <PwmOut.h>
 #include <InterruptIn.h>
 
@@ -9,6 +10,8 @@ using namespace mbed;
 #include "IRSensor.h"
 #include "USSensor.h"
 #include "ServoController.h"
+
+#include "BotController.h"
 
   //pins for the motors
   PinName APow = P0_27;
@@ -24,6 +27,10 @@ using namespace mbed;
   //servo signal pin
   int servoSig = 4;
   PinName servoPin = P1_15;
+
+  //pin for button input
+  PinName buttonIn = P0_28;
+
 
 
   //left and right motor, and the motor controller objects
@@ -43,6 +50,9 @@ using namespace mbed;
   Servo myServo;
 
 
+  BotController* botController; //overall bot controller
+
+
   //rtos::Thread mapThread; //will be used for us sensor movement and mapping to prevent processor starvation
 
 
@@ -56,13 +66,13 @@ void setup() {
 
 
   //set up motor objects and controller
-  motorA = new Motor(ADir, APow, 1, AEnc);
-  motorB = new Motor(BDir, BPow, 0, BEnc);
+  motorA = new Motor(ADir, APow, 1, AEnc, 0.974);
+  motorB = new Motor(BDir, BPow, 0, BEnc, 1);
   controller = new MotorController(motorA, motorB);
 
   //set motors to idle
   controller->turn(0);
-  controller->move(0);
+  controller->speed(0);
   controller->encoderUpdate();
 
   //set up IR sensors
@@ -76,78 +86,56 @@ void setup() {
   servo = new ServoController(servoSig, TrigEcho);
   
   //servo sweep needs multithreading as it uses a lot of wait functions
-  //servo->sweep(8, 140);
-
-  //myServo.attach(servoSig);
+  myServo.attach(servoSig);
+  //servo->sweep(4, 140);
   
+  botController = new BotController(controller, us1, ir1, ir2, servo);
+  botController->setSpeed(0.8f);
  
 }
 
 
 int temp2 = 0;
 void loop() {
+  
+  us1Out = us1->avgOutput();
 
-    controller->printEncoder();
+  //Serial.println("us1 output:");
+  //Serial.println(us1Out);
 
-    wait_us(10000);
-   
-    us1Out = us1->getOutput();
+  ir1Out = ir1->getOutput();
 
-    //Serial.println("us1 output:");
-    //Serial.println(us1Out);
-    
-
-    ir1Out = ir1->getOutput();
-
-    //Serial.println("ir1 output:");
-    //Serial.println(ir1Out);
-    
-
+  //Serial.println("ir1 output:");
+  //Serial.println(ir1Out);
     ir2Out = ir2->getOutput();
 
-   // Serial.println("ir2 output:");
-   // Serial.println(ir2Out);
-    
+  //Serial.println("ir2 output:");
+  //.println(ir2Out);
 
-  
-  //reset motor movement
-  controller->move(0);
+
+  //botController->wallFollow();
+    
 
   //wasd movement
   if(Serial.available() >0){
 
-
     char input = Serial.read();
+
     if(input == 'w'){
-      controller->turn(0);
-      controller->move(0.8f);
+      //botController->turnAngle(-90);
+      //botController->wallFollow();
+      botController->sweep(4,140);
       
-      wait_us(1000000);
     }
     if(input == 'a'){
-    controller->turn(-1);
-    controller->move(0.8f);
-  
-    wait_us(1000000);
     }
 
     if(input == 'd'){
-    controller->turn(1);
-    controller->move(0.8f);
-  
-    wait_us(1000000);
     }
     if(input == 's'){
-    controller->turn(0);
-    controller->move(-0.8f);
-  
-    wait_us(1000000);
     }
-
-
   }
-  
-  
+  wait_us(100000);
 }
 
 

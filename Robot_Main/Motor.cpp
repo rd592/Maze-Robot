@@ -2,8 +2,8 @@
 using namespace mbed;
  
 
-Motor::Motor(PinName dirPin, PinName powPin, bool inverse, PinName encoderPin):
-  _dirPin(dirPin), _powPin(powPin), _dirOut(dirPin), _powOut(powPin), _inverse(inverse), _encoderPin(encoderPin), _encInt(encoderPin)
+Motor::Motor(PinName dirPin, PinName powPin, bool inverse, PinName encoderPin, float adjust):
+  _dirPin(dirPin), _powPin(powPin), _dirOut(dirPin), _powOut(powPin), _inverse(inverse), _encoderPin(encoderPin), _encInt(encoderPin), _adjust(adjust)
 {
   _frequency_kHz = 2; //intitial values
   //setFrequency(_frequency_kHz);
@@ -25,7 +25,8 @@ void Motor::countPulse(){
 //interrupt start function
 void Motor::encUpdate(){
   _encCount = 0;
-  _encInt.rise(callback(this, &Motor::countPulse));
+  _encInt.rise(callback(this, &Motor::countPulse)); //updates the encoder counter on every rising edge
+  _encInt.fall(callback(this, &Motor::countPulse)); //updates the encoder counter on every falling edge
 }
 
 //return encoder output adjusting for inversion
@@ -74,14 +75,14 @@ void Motor::setDirection(bool direction){
 
 //sets the duty cycle of the PWM output. float between 0 and 1
 void Motor::setDutyCycle(float dutyCycle){
-  if(dutyCycle > 1){
+  if(dutyCycle*_adjust > 1){
     _dutyCycle = 1;
   }
-  else if(dutyCycle < 0){
+  else if(dutyCycle*_adjust < 0){
     _dutyCycle = 0;
   }
   else{
-    _dutyCycle = dutyCycle;
+    _dutyCycle = dutyCycle*_adjust;
   }
   _powOut.write(_dutyCycle);
 }

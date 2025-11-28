@@ -14,6 +14,7 @@ class Motor{
   bool _inverse; //if the motor is facing in the opposite direction, reverses movement direction
   float _dutyCycle; //PWM duty cycle
   int _frequency_kHz; //PWM frequency
+  float _adjust; //adjust for motor differences 
   
 
   PinName _encoderPin;
@@ -23,11 +24,11 @@ class Motor{
   mbed::PwmOut _powOut;
 
   long int _shaftRevs;
-  long int _encCount;
-  mbed::InterruptIn _encInt;
+  long int _encCount; //encoder count 
+  mbed::InterruptIn _encInt; //interrupt to update the encoder
 
 
-  Motor(PinName dirPin, PinName powPin, bool inverse, PinName encoderPin);
+  Motor(PinName dirPin, PinName powPin, bool inverse, PinName encoderPin, float adjust);
 
 
   void countPulse();  //encoder updater

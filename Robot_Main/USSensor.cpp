@@ -8,6 +8,21 @@ USSensor::USSensor(PinName pin):
   
 }
 
+float USSensor::avgOutput(){
+  float average = 0;
+
+  for(int i = 0; i<=10; i++){
+    float temp = getOutput();
+    average = average+temp;
+    wait_us(1000);
+
+  }
+  average = average/10;
+  return average;
+
+
+}
+
 //gives ultrasonic sensor output in cm
 float USSensor::getOutput(){
 _timer.stop();
@@ -35,6 +50,9 @@ _timer.stop();
 _distance = time*0.034/2; //distance calc. 0.034 is speed of sound cm/microseconds. returns microseconds
 
 //Serial.println("STOP3");
+//if(_distance >= 200){
+//  _distance = 1;
+//}
 return _distance;
   
 }
