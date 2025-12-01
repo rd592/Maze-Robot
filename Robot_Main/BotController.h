@@ -6,6 +6,21 @@
 #include "USSensor.h"
 #include "ServoController.h"
 #include "IRSensor.h"
+ 
+
+ //states for fsm
+ //still needs implementation of find pos for setup, map follow, and an end state
+enum BotState{
+  STATE_STOP = 0,
+  STATE_FORWARD,
+  STATE_BACKWARD,
+  STATE_LEFT,
+  STATE_RIGHT,
+  STATE_ALIGN,
+  STATE_MAP
+};
+extern BotState currentState;
+
 
 //this class is the overall abstracted bot controller. Contains all functions needed for bot control
 class BotController{
@@ -35,6 +50,12 @@ float _yPos = 0;
 
 float _speed = 1.0f; //robot move speed
 
+
+
+// FSM transition bools
+bool _mapping = 0, _blockedFront = 0, _blockedRight = 0, _aligning = 0;
+
+
 public:
 BotController(MotorController* motorController, USSensor* USSensor, IRSensor* ir1, IRSensor* ir2, ServoController* servo);
 
@@ -59,6 +80,11 @@ void wallAlign();
 void wallFollow();
 
 void sweep(int points, int angleRange); //performs a servo sweep, updates distanceArray pointer
+
+void map(); //map area in front of robot
+
+
+void fsmStart(); //finite state machine start function
 
 };
 

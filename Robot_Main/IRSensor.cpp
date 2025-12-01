@@ -9,6 +9,7 @@ IRSensor::IRSensor(char mux_address, char mux_cmd)
 float IRSensor::avgOutput(){
   float average = 0;
 
+  //takes 10 readings to find an average
   for(int i = 0; i<10; i++){
     float temp = getOutput();
     average = average+temp;
