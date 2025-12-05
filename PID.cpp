@@ -3,22 +3,28 @@
 
 PID:: PID(){}
 
-double PID:: computePID(double inp) {
-  currentTime = millis();
-  elapsedTime = (double)(currentTime - previousTime);
+double PID::computePID(double inp, double setPoint)
+{
+    currentTime = millis();
+    elapsedTime = (currentTime - previousTime) / 1000.0; // seconds
 
-  error = setPoint - inp;
-  cumError += error * elapsedTime;
-  rateError = (error - lastError) / elapsedTime;
+    error = setPoint - inp;
 
-  double out = Kp * error + Ki * cumError + Kd * rateError;
+    // Integral with anti-windup
+    //cumError += error * elapsedTime;
+    //cumError = constrain(cumError, -iLimit, iLimit);
 
-  // --- Prevent integral wind-up ---
-  out = constrain(out, 0, 255);  
+    // Derivative
+    //rateError = (error - lastError) / elapsedTime;
 
-  lastError = error;
-  previousTime = currentTime;
+    //double out = Kp * error + Kd * rateError;
+    double out = Kp * error;
 
-  out = (out-127.5)/255; //returns out between -1 and 1
-  return out;
+    // Limit output to -1, 1
+    out = constrain(out, -1.0, 1.0);
+
+    lastError = error;
+    previousTime = currentTime;
+
+    return out;
 }

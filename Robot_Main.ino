@@ -107,15 +107,20 @@ void loop() {
 
   //Serial.println("ir1 output:");
   //Serial.println(ir1Out);
-    ir2Out = ir2->getOutput();
+  ir2Out = ir2->getOutput();
 
   //Serial.println("ir2 output:");
   //.println(ir2Out);
 
+  Serial.println("x position:");
+  Serial.println(botController->_x);
+  Serial.println("y position:");
+  Serial.println(botController->_y);
+
 
   //botController->wallFollow();
     
-
+  //botController->moveUntil(40,5);
   //wasd movement
   if(Serial.available() >0){
 
@@ -124,7 +129,9 @@ void loop() {
     if(input == 'w'){
       //botController->turnAngle(-90);
       //botController->wallFollow();
-      botController->sweep(4,140);
+      //botController->sweep(4,140);
+      //botController->moveUntil(20,10);
+      
       
     }
     if(input == 'a'){

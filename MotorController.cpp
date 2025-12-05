@@ -144,7 +144,7 @@ void MotorController::speedTurn(float speed, float PIDOutput){
   _MotorLeft->setDirection(_MotorLeftDir*moveDir);
   _MotorRight->setDirection(_MotorRightDir*moveDir);
 
-  _MotorLeft->setDutyCycle(abs(speed*L));
-  _MotorRight->setDutyCycle(abs(speed*R));
+  _MotorLeft->setDutyCycle(fabs(speed*R));
+  _MotorRight->setDutyCycle(fabs(speed*L));
 }
 

@@ -57,34 +57,33 @@ void BotController::moveDistance(float distance){
 }
 
 
-
-//IMPLEMENT PID INTO THIS FUNCTION TO ALIGN TO WALLS WHILE MOVING
-
-//moves until something is detected in front
+//moves until something is detected in front, PID implemented to stay a set distance from a wall
 void BotController::moveUntil(float distance, float stoppingDistance){
 
-  float currentDistance = _motorController->getDistanceLeft(); //only uses left side motor distance, shouldnt be a problem
+  //average of both wheels distance
+  float currentDistance = (_motorController->getDistanceLeft()+_motorController->getDistanceRight())/2;
 
-  //loop until distance is too close
-  while(abs(_motorController->getDistanceLeft()-currentDistance) <abs(distance)){
-    double error = (double)(_ir1Out-_ir2Out);
+  //loop until obstacle detected or distance reached
+  while(abs((_motorController->getDistanceLeft()+_motorController->getDistanceRight())/2) <abs(distance)){
+    double error = (double)((_ir1Out+_ir2Out)/2);
     sensorUpdate();
 
-    //this line might be iffy
-    double PIDAdjust = pid.computePID(error); //computes PID input value based on difference between sensors
+    double PIDAdjust = pid.computePID(error, 10); //computes PID input value based on difference between sensors
+    Serial.println(PIDAdjust);
 
     //stop if an obstacle in front
     if(_us1Out <= stoppingDistance){
       _motorController->speed(0.0f);
-      posUpdate(_motorController->getDistanceLeft()-currentDistance);
+      posUpdate(((_motorController->getDistanceLeft()+_motorController->getDistanceRight())/2)-currentDistance);
       _blockedFront = 1;
+      _stopped = 1;
       break;
     }
     //*****************
     //***************** REMOVE WALLALIGN FROM FUNCTION CALL AND FSM
-    _motorController->speedTurn(_speed,PIDAdjust); //speed function adjusted for PID output *******THIS NEEDS LAB TESTING AS NEWLY IMPLEMENTED***********
-    //*****************
-    //*****************
+
+    _motorController->speedTurn(_speed, PIDAdjust); //speed function adjusted for PID output
+
   }
   _motorController->speed(0.0f); //turn off motors once destination reached, update position
   posUpdate(_motorController->getDistanceLeft()-currentDistance);
@@ -135,14 +134,14 @@ void BotController::wallFollow(){
   _noWall = 0;
   while(1){
     sensorUpdate();
-    wallAlign();
+    //wallAlign();
 
     //if not stopped in front
     if(_stopped == 0){
       //if a wall is on the right, can continue
       if(_ir1Out < _wallDetectionDistance || _ir2Out < _wallDetectionDistance){
         
-        moveUntil(5,_stoppingDistance);
+        moveUntil(20,_stoppingDistance);
       }
       
       //if no wall on right, turn right
@@ -150,7 +149,7 @@ void BotController::wallFollow(){
         _noWall = 1; 
         moveUntil(5,_stoppingDistance); //prevents wall collision
         turnAngle(90);
-        moveUntil(5,_stoppingDistance); //keep moving until back to a wall
+        moveUntil(10,_stoppingDistance); //keep moving until back to a wall
       }
       
       

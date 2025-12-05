@@ -7,22 +7,22 @@
 class PID{
 
 // --- PID constants (tune these for your system) ---
-double Kp = 2.0;
-double Ki = 5.0;
-double Kd = 1.0;
+double Kp = 0.15f;
+//double Ki = 0.0;
+double Kd = 0.5f;
 
 // --- PID variables ---
 unsigned long currentTime, previousTime;
 double elapsedTime;
 double error, lastError;
-double input, output, setPoint;
+double input, output;
 double cumError, rateError;
 
 
 public:
 
 PID();
-double computePID(double inp);
+double computePID(double inp, double setPoint);
 
 } ;
 

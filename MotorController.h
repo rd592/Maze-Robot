@@ -6,9 +6,11 @@
 #include <PwmOut.h>
 #include "Motor.h"
 #include "PID.h"
+#include "math.h"
 
 #define PI 3.1415926
 
+using namespace std;
 
 class MotorController{
 
